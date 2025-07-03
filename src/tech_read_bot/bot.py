@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
+from tabulate import tabulate
+
 from .database import TechReadDao
+from .utils import tabulate_db_objects
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -8,11 +11,14 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 db = TechReadDao()
 
+
 @bot.event
 async def on_ready():
     print(f"logged in as {bot.user} test")
 
-@bot.command(help="""
+
+@bot.command(
+    help="""
 Adds a new reading.
 
 Usage: 
@@ -21,28 +27,39 @@ Usage:
 
 Example: 
     !add_reading "thonk more masterclass" "5"
-""")
+"""
+)
 async def add_reading(ctx, title, duration_days=7):
     db.create_reading(title=title, duration=duration_days)
-    await ctx.send(f'Title of reading is {title}. Duration of reading is {duration_days} days')
+    await ctx.send(
+        f"Title of reading is {title}. Duration of reading is {duration_days} days"
+    )
+
 
 @bot.command()
-async def get_readings(ctx):
-    pass
+async def get_readings(ctx, status="in_progress"):
+    # status = ("in_progress", "done", "all")
+    readings = db.get_readings(status=status)
+    table_str = tabulate_db_objects(readings)
+
+    await ctx.send(f"```\n{table_str}\n```")
+
 
 @bot.command()
 async def add_reminder(ctx):
     pass
 
+
 @bot.command()
 async def get_reminders(ctx):
     pass
+
 
 @bot.command()
 async def add_note(ctx):
     pass
 
+
 @bot.command()
 async def get_notes(ctx):
     pass
-

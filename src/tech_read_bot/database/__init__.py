@@ -26,6 +26,14 @@ class TechReadDao:
                 session.rollback()
                 raise e
 
+    def get_readings(self, status="in_progress"):
+        with self.SessionLocal() as session:
+            query = session.query(Reading)
+            if status != "all":
+                query = query.filter(Reading.status == status)
+
+            return query.all()
+
     def create_note(self, reading_id, user_id, content):
         with self.SessionLocal() as session:
             try:

@@ -5,7 +5,7 @@ Database module for managing reading data, notes, and reminders using SQLAlchemy
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Date, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from datetime import datetime,  timezone
+from datetime import datetime, timezone
 import os
 
 Base = declarative_base()
@@ -22,6 +22,9 @@ class Reading(Base):
 
     # Relationships
     notes = relationship("Note", back_populates="reading", cascade="all, delete-orphan")
+
+    def __str__(self):
+        return f"<Reading(id={self.id}, title='{self.title}', status='{self.status}', created_at={self.created_at}, duration={self.duration})>"
 
 
 
