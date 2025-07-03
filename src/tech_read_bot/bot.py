@@ -14,7 +14,7 @@ db = TechReadDao()
 
 @bot.event
 async def on_ready():
-    print(f"logged in as {bot.user} test")
+    print(f"logged in as {bot.user}")
 
 
 @bot.command(
