@@ -1,7 +1,10 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .models import Base, Reading, Note
-import os
+
+from .models import Base, Note, Reading
+
 
 class TechReadDao:
     def __init__(self, db_url=None):
@@ -14,7 +17,7 @@ class TechReadDao:
     def init_db(self):
         Base.metadata.create_all(self.engine)
 
-    def create_reading(self, title, duration, status="in_progress"):
+    def create_reading(self, title: str, duration: int, status: str = "in_progress"):
         with self.SessionLocal() as session:
             try:
                 reading = Reading(title=title, duration=duration, status=status)
@@ -26,13 +29,30 @@ class TechReadDao:
                 session.rollback()
                 raise e
 
-    def get_readings(self, status="in_progress"):
+    def get_readings(self, status: str = "in_progress"):
         with self.SessionLocal() as session:
             query = session.query(Reading)
             if status != "all":
                 query = query.filter(Reading.status == status)
 
             return query.all()
+
+    def update_reading(self, id: int, status: str):
+        with self.SessionLocal() as session:
+            try:
+                reading = session.query(Reading).filter(Reading.id == id).first()
+
+                if not reading:
+                    raise Exception(f"Reading with id {id} not found")
+
+                reading.status = status
+                session.commit()
+                session.refresh(reading)
+                return reading
+
+            except Exception as e:
+                session.rollback()
+                raise e
 
     def create_note(self, reading_id, user_id, content):
         with self.SessionLocal() as session:

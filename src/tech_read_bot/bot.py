@@ -46,6 +46,18 @@ async def get_readings(ctx, status="in_progress"):
 
 
 @bot.command()
+async def mark_done(ctx, reading_id):
+    reading = db.update_reading(reading_id, status="done")
+    await ctx.send(f"Reading with id {reading_id} marked as done\n.`{reading}`")
+
+
+@bot.command()
+async def mark_in_progress(ctx, reading_id):
+    reading = db.update_reading(reading_id, status="in_progress")
+    await ctx.send(f"Reading with id {reading_id} marked as in_progress\n.`{reading}`")
+
+
+@bot.command()
 async def add_reminder(ctx):
     pass
 
