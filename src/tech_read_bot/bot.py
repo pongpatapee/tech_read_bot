@@ -40,6 +40,14 @@ async def add_reading(ctx, title, duration_days=7):
 async def get_readings(ctx, status="in_progress"):
     # status = ("in_progress", "done", "all")
     readings = db.get_readings(status=status)
+    if len(readings) == 0:
+        if status == "all":
+            await ctx.send("No readings found")
+        else:
+            await ctx.send(f"No {status} readings found")
+
+        return
+
     table_str = tabulate_db_objects(readings)
 
     await ctx.send(f"```\n{table_str}\n```")
