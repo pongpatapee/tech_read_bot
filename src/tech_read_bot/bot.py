@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from tabulate import tabulate
 
-from .database import TechReadDao
+from .database.dao import TechReadDao
 from .utils import tabulate_db_objects
 
 intents = discord.Intents.default()
