@@ -150,7 +150,19 @@ async def get_reminders(ctx):
         await ctx.send("No reminders found")
         return
 
-    table_str = tabulate_db_objects(reminders)
+    enriched_reminders = []
+    for reminder in reminders:
+        reading = db.get_reading(reminder.reading_id)
+        enriched_reminders.append(
+            {
+                "id": reminder.id,
+                "reading_id": reading.id,
+                "reading_title": reading.title,
+                "reminder_datetime": reminder.reminder_datetime,
+            }
+        )
+
+    table_str = tabulate(enriched_reminders, headers="keys")
     await ctx.send(f"```\n{table_str}\n```")
 
 
@@ -163,13 +175,3 @@ async def delete_reminder(ctx, id):
         return
 
     await ctx.send(f"Reminder with id {id} deleted")
-
-
-@bot.command()
-async def add_note(ctx):
-    pass
-
-
-@bot.command()
-async def get_notes(ctx):
-    pass

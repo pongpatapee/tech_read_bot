@@ -7,9 +7,10 @@
 - Set current week's reading
 - Track past readings
 - Send discussion reminders
-- Notes for each reading
 
 ### Maybe
+
+- Notes for each reading
 - Suggest/vote on next readings
 - Thread/channel for discussion
 - Mark reading as read/not read
