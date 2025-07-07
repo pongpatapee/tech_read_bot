@@ -77,6 +77,13 @@ async def on_ready():
         process_reminders.start()
 
 
+@bot.event
+async def on_command_error(ctx, error):
+    logger.error(f"Error processing command '{ctx.command}': {error}")
+
+    await ctx.send(f"Error processing command '{ctx.command}': {error}")
+
+
 @bot.command(
     help="""
 Adds a new reading to the list and a reminder according to the specified duration.
