@@ -1,9 +1,10 @@
 import os
+from datetime import datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .models import Base, Note, Reading
+from .models import Base, Note, Reading, Reminder
 
 
 class TechReadDao:
@@ -29,6 +30,10 @@ class TechReadDao:
                 session.rollback()
                 raise e
 
+    def get_reading(self, id: int):
+        with self.SessionLocal() as session:
+            return session.query(Reading).filter(Reading.id == id).first()
+
     def get_readings(self, status: str = "in_progress"):
         with self.SessionLocal() as session:
             query = session.query(Reading)
@@ -49,6 +54,54 @@ class TechReadDao:
                 session.commit()
                 session.refresh(reading)
                 return reading
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+    def delete_reading(self, id: int):
+        with self.SessionLocal() as session:
+            try:
+                reading = session.query(Reading).filter(Reading.id == id).first()
+
+                if not reading:
+                    raise Exception(f"Reading with id {id} not found")
+
+                session.delete(reading)
+                session.commit()
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+    def create_reminder(self, reading_id: int, reminder_datetime: datetime):
+        with self.SessionLocal() as session:
+            try:
+                reminder = Reminder(
+                    reading_id=reading_id, reminder_datetime=reminder_datetime
+                )
+                session.add(reminder)
+                session.commit()
+                session.refresh(reminder)
+                return reminder
+            except Exception as e:
+                session.rollback()
+                raise e
+
+    def get_reminders(self):
+        with self.SessionLocal() as session:
+            return session.query(Reminder).all()
+
+    def delete_reminder(self, id: int):
+        with self.SessionLocal() as session:
+            try:
+                reminder = session.query(Reminder).filter(Reminder.id == id).first()
+
+                if not reminder:
+                    raise Exception(f"Reminder with id {id} not found")
+
+                session.delete(reminder)
+                session.commit()
 
             except Exception as e:
                 session.rollback()

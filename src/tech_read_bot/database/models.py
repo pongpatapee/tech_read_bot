@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,26 +17,26 @@ class Reading(Base):
         default="in_progress",
         nullable=False,
     )
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now())
     duration = Column(Integer, nullable=False)
 
     # Relationships
     notes = relationship("Note", back_populates="reading", cascade="all, delete-orphan")
     reminders = relationship(
-        "Reminders", back_populates="reading", cascade="all, delete-orphan"
+        "Reminder", back_populates="reading", cascade="all, delete-orphan"
     )
 
     def __str__(self):
         return f"Reading(id={self.id}, title='{self.title}', status='{self.status}', created_at={self.created_at}, duration={self.duration})"
 
 
-class Reminders(Base):
+class Reminder(Base):
     __tablename__ = "reminders"
 
     id = Column(Integer, primary_key=True)
     reading_id = Column(Integer, ForeignKey("readings.id"), nullable=False)
     reminder_datetime = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now())
 
     # Relationships
     reading = relationship("Reading", back_populates="reminders")
@@ -51,7 +51,7 @@ class Note(Base):
     reading_id = Column(Integer, ForeignKey("readings.id"), nullable=False)
     user_id = Column(String(50), nullable=False)
     content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now())
 
     # Relationships
     reading = relationship("Reading", back_populates="notes")
