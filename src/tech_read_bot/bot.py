@@ -5,7 +5,10 @@ from discord.ext import commands, tasks
 from tabulate import tabulate
 
 from .database.dao import TechReadDao
+from .setup_log import create_logger
 from .utils import tabulate_db_objects
+
+logger = create_logger("tech_read_bot")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -24,7 +27,7 @@ async def create_text_channel(guild):
 
     text_channel = discord.utils.get(guild.text_channels, name=TEXT_CHANNEL_NAME)
     if text_channel:
-        print(
+        logger.info(
             f"text channel {TEXT_CHANNEL_NAME} already exists, channel_id = {text_channel.id}"
         )
         text_channel_id = text_channel.id
@@ -33,7 +36,7 @@ async def create_text_channel(guild):
         text_channel = await guild.create_text_channel(
             TEXT_CHANNEL_NAME, category=category
         )
-        print(
+        logger.info(
             f"created text channel {TEXT_CHANNEL_NAME}, channel_id = {text_channel.id}"
         )
         text_channel_id = text_channel.id
@@ -45,9 +48,9 @@ async def create_text_channel(guild):
 async def process_reminders():
     reminders = db.get_reminders()
 
-    print("checking reminders")
+    logger.info("checking reminders")
     for reminder in reminders:
-        print(f"reminder: {reminder.id}, {reminder.reminder_datetime}")
+        logger.info(f"reminder: {reminder.id}, {reminder.reminder_datetime}")
         if datetime.now() >= reminder.reminder_datetime:
             reading = db.get_reading(reminder.reading_id)
 
@@ -55,18 +58,21 @@ async def process_reminders():
                 f"Chop chop time to discuss '{reading.title}'"
             )
 
+            logger.info(
+                f"processed reminder: {reminder.id}, for reading {reading.title}"
+            )
             db.delete_reminder(reminder.id)
 
 
 @bot.event
 async def on_ready():
-    print(f"logged in as {bot.user}")
+    logger.info(f"logged in as {bot.user}")
 
     for guild in bot.guilds:
-        print(f"- Server: {guild.name} (id: {guild.id})")
+        logger.info(f"- Server: {guild.name} (id: {guild.id})")
         await create_text_channel(guild)
 
-    print("Starting processing reminders task")
+    logger.info("Starting processing reminders task")
     if not process_reminders.is_running():
         process_reminders.start()
 
