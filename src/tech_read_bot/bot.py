@@ -79,14 +79,15 @@ async def on_ready():
 
 @bot.command(
     help="""
-Adds a new reading.
+Adds a new reading to the list and a reminder according to the specified duration.
 
-Usage: 
-    !add_reading "Title" "Duration (in days)"
-    Note: default duration is 7 days
+Usage:
+    !add_reading "Title" [Duration in days]
+    If duration is not specified, defaults to 7 days.
 
-Example: 
-    !add_reading "thonk more masterclass" "5"
+Example:
+    !add_reading "Deep Learning Book" 10
+    !add_reading "Python Tricks"
 """
 )
 async def add_reading(ctx, title, duration_days=7):
@@ -101,7 +102,21 @@ async def add_reading(ctx, title, duration_days=7):
     await ctx.send(f"New reading '{title}' added. Discussion set for {due_date}")
 
 
-@bot.command()
+@bot.command(
+    help="""
+Lists readings by status.
+
+Usage:
+    !get_readings [status]
+    status can be: in_progress (default), done, or all
+
+Examples:
+    !get_readings
+    !get_readings in_progress
+    !get_readings done
+    !get_readings all
+"""
+)
 async def get_readings(ctx, status="in_progress"):
     # status = ("in_progress", "done", "all")
     readings = db.get_readings(status=status)
@@ -118,7 +133,17 @@ async def get_readings(ctx, status="in_progress"):
     await ctx.send(f"```\n{table_str}\n```")
 
 
-@bot.command()
+@bot.command(
+    help="""
+Mark a reading as done.
+
+Usage:
+    !mark_done <reading_id>
+
+Example:
+    !mark_done 3
+"""
+)
 async def mark_done(ctx, reading_id):
     db.update_reading(reading_id, status="done")
     in_progress_readings = db.get_readings(status="in_progress")
@@ -133,7 +158,17 @@ async def mark_done(ctx, reading_id):
     )
 
 
-@bot.command()
+@bot.command(
+    help="""
+Mark a reading as in-progress.
+
+Usage:
+    !mark_in_progress <reading_id>
+
+Example:
+    !mark_in_progress 2
+"""
+)
 async def mark_in_progress(ctx, reading_id):
     db.update_reading(reading_id, status="in_progress")
     in_progress_readings = db.get_readings(status="in_progress")
@@ -148,7 +183,14 @@ async def mark_in_progress(ctx, reading_id):
     )
 
 
-@bot.command()
+@bot.command(
+    help="""
+Show all scheduled reminders for readings.
+
+Usage:
+    !get_reminders
+"""
+)
 async def get_reminders(ctx):
     reminders = db.get_reminders()
 
@@ -172,7 +214,17 @@ async def get_reminders(ctx):
     await ctx.send(f"```\n{table_str}\n```")
 
 
-@bot.command()
+@bot.command(
+    help="""
+Delete a reminder by its ID.
+
+Usage:
+    !delete_reminder <reminder_id>
+
+Example:
+    !delete_reminder 5
+"""
+)
 async def delete_reminder(ctx, id):
     try:
         db.delete_reminder(id)
