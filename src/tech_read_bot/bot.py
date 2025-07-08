@@ -142,6 +142,22 @@ async def get_readings(ctx, status="in_progress"):
 
 @bot.command(
     help="""
+Delete a reading by its ID.
+
+Usage:
+    !delete_reading <reading_id>
+
+Example:
+    !delete_reading 5
+"""
+)
+async def delete_reading(ctx, id):
+    db.delete_reading(id)
+    await ctx.send(f"Reading with id {id} deleted")
+
+
+@bot.command(
+    help="""
 Mark a reading as done.
 
 Usage:
